@@ -72,6 +72,31 @@ class Property(models.Model):
     def __str__(self):
         return self.property_name
 
+    @property
+    def image_url(self):
+        try:
+            if self.image and self.image.storage.exists(self.image.name):
+                return self.image.url
+        except Exception:
+            pass
+
+        # Fallback to direct unsplash URLs based on name matches
+        name = self.property_name.lower()
+        if 'sunset' in name or 'guest' in name:
+            return 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=800&auto=format&fit=crop'
+        elif 'villa' in name or 'garden' in name:
+            return 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=800&auto=format&fit=crop'
+        elif 'silicon' in name or 'premium' in name:
+            return 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop'
+        elif 'hostel' in name or 'living' in name:
+            return 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop'
+        elif 'ahmedabad' in name or 'heights' in name:
+            return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop'
+        elif 'rajkot' in name or 'cozy' in name:
+            return 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800&auto=format&fit=crop'
+        
+        return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop'
+
 class PropertyImages(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to='property_gallery/')

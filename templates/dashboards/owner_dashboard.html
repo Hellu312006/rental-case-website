@@ -101,7 +101,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ prop.image.url }}" alt="{{ prop.property_name }}" class="rounded-3 me-3" style="width: 60px; height: 45px; object-fit: cover;">
+                                        <img src="{{ prop.image_url }}" alt="{{ prop.property_name }}" class="rounded-3 me-3" style="width: 60px; height: 45px; object-fit: cover;">
                                         <div>
                                             <div class="fw-bold"><a href="{% url 'property_detail' prop.id %}" class="text-decoration-none text-dark">{{ prop.property_name }}</a></div>
                                             <span class="text-muted small"><i class="bi bi-geo-alt me-1 text-danger"></i>{{ prop.city.name }}, {{ prop.state.name }}</span>

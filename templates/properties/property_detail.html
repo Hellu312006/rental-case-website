@@ -17,14 +17,14 @@
             
             <!-- Main Large Image -->
             <div class="position-relative mb-3">
-                <img id="mainGalleryImg" src="{{ property.image.url }}" alt="{{ property.property_name }}" class="gallery-main-img shadow-sm">
+                <img id="mainGalleryImg" src="{{ property.image_url }}" alt="{{ property.property_name }}" class="gallery-main-img shadow-sm">
                 <span class="card-badge bg-primary fs-6 px-3 py-2">{{ property.property_type }}</span>
             </div>
 
             <!-- Gallery Thumbnails (only if there are multiple images) -->
             <div class="row g-2 mb-5">
                 <div class="col-3">
-                    <img src="{{ property.image.url }}" alt="Thumbnail Main" class="gallery-thumbnail active" onclick="changeMainImage('{{ property.image.url }}', this)">
+                    <img src="{{ property.image_url }}" alt="Thumbnail Main" class="gallery-thumbnail active" onclick="changeMainImage('{{ property.image_url }}', this)">
                 </div>
                 {% for gallery in gallery_images %}
                     <div class="col-3">
