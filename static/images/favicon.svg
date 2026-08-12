@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#grad)" />
+  <!-- House Shape -->
+  <path d="M256 120 L380 230 L350 230 L350 370 C350 380 340 390 330 390 L290 390 L290 300 C290 290 280 280 270 280 L242 280 C232 280 222 290 222 300 L222 390 L182 390 C172 390 162 380 162 370 L162 230 L132 230 Z" fill="#ffffff" />
+  <!-- Light Blue Sun Accent -->
+  <circle cx="360" cy="160" r="25" fill="#38bdf8" />
+</svg>
