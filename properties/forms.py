@@ -1,7 +1,16 @@
 from django import forms
 from .models import Property, PropertyImages, Country, State, City
 
+def validate_image_size(value):
+    if value:
+        max_size = 5 * 1024 * 1024  # 5MB limit
+        if value.size > max_size:
+            raise forms.ValidationError("File size cannot exceed 5MB.")
+    return value
+
 class PropertyForm(forms.ModelForm):
+    image = forms.ImageField(required=True, validators=[validate_image_size], widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Property
         fields = [
@@ -23,7 +32,6 @@ class PropertyForm(forms.ModelForm):
             'security_deposit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Security deposit amount'}),
             'available_rooms': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Rooms currently available'}),
             'total_rooms': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Total rooms in property'}),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -70,9 +78,8 @@ class PropertyForm(forms.ModelForm):
 
 
 class PropertyImageForm(forms.ModelForm):
+    image = forms.ImageField(required=True, validators=[validate_image_size], widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = PropertyImages
         fields = ['image']
-        widgets = {
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
-        }

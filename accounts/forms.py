@@ -5,7 +5,15 @@ from properties.models import Country, State, City
 
 User = get_user_model()
 
+def validate_image_size(value):
+    if value:
+        max_size = 5 * 1024 * 1024  # 5MB limit
+        if value.size > max_size:
+            raise forms.ValidationError("File size cannot exceed 5MB.")
+    return value
+
 class UserRegistrationForm(forms.ModelForm):
+    profile_image = forms.ImageField(required=False, validators=[validate_image_size], widget=forms.FileInput(attrs={'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
         'placeholder': 'Create Password'
@@ -23,7 +31,6 @@ class UserRegistrationForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email Address'}),
             'role': forms.Select(attrs={'class': 'form-select'}),
-            'profile_image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def clean_email(self):
@@ -65,7 +72,8 @@ class UserLoginForm(forms.Form):
 class UserProfileForm(forms.ModelForm):
     first_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    profile_image = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    profile_image = forms.ImageField(required=False, validators=[validate_image_size], widget=forms.FileInput(attrs={'class': 'form-control'}))
+    image = forms.ImageField(required=False, validators=[validate_image_size], widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = UserProfile

@@ -133,13 +133,16 @@
                             <!-- Wishlist Absolute Button -->
                             {% if request.user.is_authenticated and request.user.role == 'Tenant' %}
                                 <div class="wishlist-btn-absolute">
-                                    <a href="{% url 'toggle_wishlist' prop.id %}" class="btn-wishlist shadow-sm">
-                                        {% if prop.id in wishlisted_ids %}
-                                            <i class="bi bi-heart-fill"></i>
-                                        {% else %}
-                                            <i class="bi bi-heart"></i>
-                                        {% endif %}
-                                    </a>
+                                    <form action="{% url 'toggle_wishlist' prop.id %}" method="POST" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-wishlist shadow-sm" style="border: none; outline: none;">
+                                            {% if prop.id in wishlisted_ids %}
+                                                <i class="bi bi-heart-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-heart"></i>
+                                            {% endif %}
+                                        </button>
+                                    </form>
                                 </div>
                             {% endif %}
                         </div>

@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from properties.models import Property
 from .models import Wishlist
 
 @login_required
+@require_POST
 def toggle_wishlist(request, property_id):
     property_obj = get_object_or_404(Property, pk=property_id)
     

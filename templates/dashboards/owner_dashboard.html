@@ -178,8 +178,14 @@
                                 </td>
                                 <td class="text-end">
                                     {% if req.status == 'Pending' %}
-                                        <a href="{% url 'booking_action' req.id 'approve' %}" class="btn btn-sm btn-success px-3 me-1 fw-bold"><i class="bi bi-check-lg"></i> Approve</a>
-                                        <a href="{% url 'booking_action' req.id 'reject' %}" class="btn btn-sm btn-danger px-3 fw-bold"><i class="bi bi-x-lg"></i> Reject</a>
+                                        <form action="{% url 'booking_action' req.id 'approve' %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success px-3 me-1 fw-bold"><i class="bi bi-check-lg"></i> Approve</button>
+                                        </form>
+                                        <form action="{% url 'booking_action' req.id 'reject' %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger px-3 fw-bold"><i class="bi bi-x-lg"></i> Reject</button>
+                                        </form>
                                     {% else %}
                                         <span class="text-muted small">Processed</span>
                                     {% endif %}

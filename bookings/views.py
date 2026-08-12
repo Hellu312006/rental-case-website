@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from properties.models import Property
 from .models import BookingRequest
@@ -49,6 +50,7 @@ def create_booking(request, property_id):
 
 
 @login_required
+@require_POST
 def booking_action(request, booking_id, action):
     booking = get_object_or_404(BookingRequest, pk=booking_id)
     

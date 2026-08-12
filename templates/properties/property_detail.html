@@ -158,13 +158,16 @@
                 <div class="d-flex flex-column gap-2">
                     <!-- Wishlist Toggle (Tenant Only) -->
                     {% if request.user.is_authenticated and request.user.role == 'Tenant' %}
-                        <a href="{% url 'toggle_wishlist' property.id %}" class="btn {% if is_wishlisted %}btn-danger{% else %}btn-outline-danger{% endif %} py-2 fw-bold w-100">
-                            {% if is_wishlisted %}
-                                <i class="bi bi-heart-fill me-2"></i> Remove Wishlist
-                            {% else %}
-                                <i class="bi bi-heart me-2"></i> Add to Wishlist
-                            {% endif %}
-                        </a>
+                        <form action="{% url 'toggle_wishlist' property.id %}" method="POST" class="w-100">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if is_wishlisted %}btn-danger{% else %}btn-outline-danger{% endif %} py-2 fw-bold w-100">
+                                {% if is_wishlisted %}
+                                    <i class="bi bi-heart-fill me-2"></i> Remove Wishlist
+                                {% else %}
+                                    <i class="bi bi-heart me-2"></i> Add to Wishlist
+                                {% endif %}
+                            </button>
+                        </form>
                     {% endif %}
 
                     <!-- Owner Quick info -->

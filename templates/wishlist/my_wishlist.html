@@ -23,9 +23,12 @@
                         
                         <!-- Remove button -->
                         <div class="wishlist-btn-absolute">
-                            <a href="{% url 'toggle_wishlist' item.property.id %}" class="btn-wishlist shadow-sm" title="Remove from Wishlist">
-                                <i class="bi bi-heart-fill"></i>
-                            </a>
+                            <form action="{% url 'toggle_wishlist' item.property.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-wishlist shadow-sm" style="border: none; outline: none;" title="Remove from Wishlist">
+                                    <i class="bi bi-heart-fill"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="card-body p-4 d-flex flex-column flex-grow-1">
