@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus-fill text-primary display-4"></i>
+                        <h3 class="fw-bold text-dark mt-2">Create Your Account</h3>
+                        <p class="text-muted small">Register to start listing or browsing properties</p>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger border-0">
+                            {% for error in form.non_field_errors %}
+                                <div class="small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label small fw-semibold text-muted">First Name</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.first_name.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label small fw-semibold text-muted">Last Name</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.last_name.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted">Email Address</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.email.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted">Select Account Role</label>
+                                {{ form.role }}
+                                {% if form.role.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.role.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted">Upload Profile Picture (Optional)</label>
+                                {{ form.profile_image }}
+                                {% if form.profile_image.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.profile_image.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label small fw-semibold text-muted">Password</label>
+                                {{ form.password }}
+                                {% if form.password.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.password.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label small fw-semibold text-muted">Confirm Password</label>
+                                {{ form.confirm_password }}
+                                {% if form.confirm_password.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.confirm_password.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm mt-4">Create Account</button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="small text-muted mb-0">Already have an account? <a href="{% url 'login' %}" class="fw-semibold text-primary text-decoration-none">Sign In</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

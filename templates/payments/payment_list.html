@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments Ledger - RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="bi bi-credit-card-2-back text-primary me-2"></i> Rent Payments Ledger</h2>
+            <p class="text-muted mb-0">Record and track monthly rent payments for properties.</p>
+        </div>
+        <a href="{% url 'dashboard_redirect' %}" class="btn btn-outline-secondary fw-semibold"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
+    </div>
+
+    <div class="row g-4">
+        
+        <!-- Left: Payments Table -->
+        <div class="{% if request.user.role == 'Tenant' %}col-lg-8{% else %}col-12{% endif %}">
+            <div class="card border-0 shadow-sm rounded-3 p-4">
+                <h5 class="fw-bold text-dark mb-4"><i class="bi bi-list-columns-reverse text-primary me-2"></i> Transaction History</h5>
+                
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="table-light small text-uppercase">
+                            <tr>
+                                <th>Property</th>
+                                {% if request.user.role == 'Owner' %}
+                                    <th>Tenant</th>
+                                {% endif %}
+                                <th>Amount</th>
+                                <th>Month</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Transaction Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ payment.property.property_name }}</div>
+                                        <span class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ payment.property.city.name }}</span>
+                                    </td>
+                                    {% if request.user.role == 'Owner' %}
+                                        <td>
+                                            <div class="fw-semibold">{{ payment.user.first_name }} {{ payment.user.last_name }}</div>
+                                            <span class="text-muted extra-small">{{ payment.user.email }}</span>
+                                        </td>
+                                    {% endif %}
+                                    <td class="fw-bold text-dark">₹{{ payment.amount }}</td>
+                                    <td>{{ payment.payment_month }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2 py-1"><i class="bi bi-wallet2 me-1"></i>{{ payment.payment_method }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if payment.status == 'Completed' %}bg-success-subtle text-success{% elif payment.status == 'Pending' %}bg-warning-subtle text-warning{% else %}bg-danger-subtle text-danger{% endif %} border px-2.5 py-1">
+                                            {{ payment.status }}
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">{{ payment.payment_date|date:"M d, Y h:i A" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="{% if request.user.role == 'Owner' %}7{% else %}6{% endif %}" class="text-center py-5 text-muted">
+                                        <i class="bi bi-cash-stack fs-1"></i>
+                                        <p class="mt-2">No payment transactions have been logged.</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Record Payment Form (Tenant Only) -->
+        {% if request.user.role == 'Tenant' %}
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Log Rent Payment</h5>
+                    
+                    {% if has_approved_bookings %}
+                        <form action="{% url 'record_payment' %}" method="POST" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted">Booked Property</label>
+                                {{ form.property }}
+                                {% if form.property.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.property.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                                <div class="form-text extra-small text-muted">Shows only properties with approved booking requests.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted">Amount Paid (₹)</label>
+                                {{ form.amount }}
+                                {% if form.amount.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.amount.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted">Payment Month</label>
+                                {{ form.payment_month }}
+                                {% if form.payment_month.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.payment_month.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted">Payment Method</label>
+                                {{ form.payment_method }}
+                                {% if form.payment_method.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.payment_method.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-semibold text-muted">Payment Status</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.status.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm"><i class="bi bi-save me-1"></i> Log Payment</button>
+                        </form>
+                    {% else %}
+                        <div class="text-center py-4 text-muted border border-dashed rounded-3">
+                            <i class="bi bi-building-lock fs-2"></i>
+                            <p class="small mt-2 px-3">You do not have any <strong>Approved</strong> bookings yet. You can log payments once an owner approves a booking request.</p>
+                            <a href="{% url 'properties_list' %}" class="btn btn-sm btn-outline-primary fw-semibold mt-1">Find Properties</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Tenant Dashboard - RentEase{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- Sidebar Navigation -->
+    <div class="dashboard-sidebar d-flex flex-column justify-content-between">
+        <div>
+            <div class="px-3 py-2 text-white-50 small text-uppercase fw-semibold mb-3">Tenant Panel</div>
+            <nav class="nav flex-column">
+                <a class="sidebar-link active" href="{% url 'dashboard_redirect' %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a class="sidebar-link" href="{% url 'properties_list' %}">
+                    <i class="bi bi-search"></i> Browse Properties
+                </a>
+                <a class="sidebar-link" href="#recent-bookings">
+                    <i class="bi bi-calendar-check"></i> My Bookings
+                </a>
+                <a class="sidebar-link" href="{% url 'my_wishlist' %}">
+                    <i class="bi bi-heart"></i> Wishlist
+                </a>
+                <a class="sidebar-link" href="{% url 'payment_list' %}">
+                    <i class="bi bi-credit-card"></i> Payments
+                </a>
+                <a class="sidebar-link" href="{% url 'profile' %}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </nav>
+        </div>
+        <div class="border-top border-secondary pt-3">
+            <a class="sidebar-link text-danger" href="{% url 'logout' %}">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Panel -->
+    <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">Welcome back, {{ request.user.first_name }}!</h2>
+                <p class="text-muted mb-0">Browse properties, check your booking requests, and manage rent payments.</p>
+            </div>
+            <a href="{% url 'properties_list' %}" class="btn btn-primary fw-bold shadow-sm"><i class="bi bi-search me-1"></i> Browse Listings</a>
+        </div>
+
+        <!-- 1. Stats Counter Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-2.4 col-lg-2.4 col-xl-2.4 col-xxl-2.4 col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #2563EB;">
+                    <div class="text-muted small fw-semibold text-uppercase">Wishlisted</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ wishlist_count }}</div>
+                    <span class="small text-muted">Favorite properties</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #0F172A;">
+                    <div class="text-muted small fw-semibold text-uppercase">Total Bookings</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ total_bookings }}</div>
+                    <span class="small text-muted">Requests submitted</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #D97706;">
+                    <div class="text-muted small fw-semibold text-uppercase">Pending</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ pending_requests }}</div>
+                    <span class="small text-muted">Awaiting response</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #059669;">
+                    <div class="text-muted small fw-semibold text-uppercase">Approved</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ approved_bookings }}</div>
+                    <span class="small text-muted">Renting actively</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #8B5CF6;">
+                    <div class="text-muted small fw-semibold text-uppercase">Payments</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ total_payments }}</div>
+                    <span class="small text-muted">Completed logs</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Recent Bookings Section -->
+        <div id="recent-bookings" class="card border-0 shadow-sm rounded-3 mb-5">
+            <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-check me-2 text-primary"></i> My Booking Requests</h5>
+            </div>
+            <div class="table-responsive px-4 pb-4">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light small text-uppercase">
+                        <tr>
+                            <th>Property Info</th>
+                            <th>Owner Contact</th>
+                            <th>Move-in Date</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in recent_bookings %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ req.property.image.url }}" alt="{{ req.property.property_name }}" class="rounded-3 me-3" style="width: 60px; height: 45px; object-fit: cover;">
+                                        <div>
+                                            <div class="fw-bold"><a href="{% url 'property_detail' req.property.id %}" class="text-decoration-none text-dark">{{ req.property.property_name }}</a></div>
+                                            <span class="text-muted small"><i class="bi bi-geo-alt me-1 text-danger"></i>{{ req.property.city.name }}, {{ req.property.state.name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ req.property.owner.first_name }} {{ req.property.owner.last_name }}</div>
+                                    <span class="text-muted small">{{ req.property.owner.email }}</span>
+                                </td>
+                                <td>{{ req.move_in_date|date:"M d, Y" }}</td>
+                                <td>{{ req.duration_months }} Months</td>
+                                <td>
+                                    <span class="badge-status {% if req.status == 'Pending' %}badge-pending{% elif req.status == 'Approved' %}badge-approved{% else %}badge-rejected{% endif %}">
+                                        {{ req.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'property_detail' req.property.id %}" class="btn btn-sm btn-light border">View Listing</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x fs-1"></i>
+                                    <p class="mt-2">You haven't submitted any booking requests yet.</p>
+                                    <a href="{% url 'properties_list' %}" class="btn btn-sm btn-primary">Find a Property</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. Split Wishlist and Payments ledger -->
+        <div class="row g-4">
+            
+            <!-- Left Wishlist Summary -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-heart-fill me-2 text-danger"></i> My Wishlist</h5>
+                        <a href="{% url 'my_wishlist' %}" class="small text-decoration-none">View All</a>
+                    </div>
+                    <div class="list-group list-group-flush px-4 pb-4">
+                        {% for item in recent_wishlist %}
+                            <div class="list-group-item px-0 py-3 border-0 border-bottom d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.property.image.url }}" alt="{{ item.property.property_name }}" class="rounded-3 me-3" style="width: 50px; height: 38px; object-fit: cover;">
+                                    <div>
+                                        <div class="fw-semibold small"><a href="{% url 'property_detail' item.property.id %}" class="text-decoration-none text-dark">{{ item.property.property_name }}</a></div>
+                                        <span class="text-primary small fw-bold">₹{{ item.property.rent_per_month }}/mo</span>
+                                    </div>
+                                </div>
+                                <a href="{% url 'toggle_wishlist' item.property.id %}" class="text-danger" title="Remove"><i class="bi bi-trash"></i></a>
+                            </div>
+                        {% empty %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-heart fs-2"></i>
+                                <p class="small mt-2">Your wishlist is empty.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Payments Summary -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-credit-card me-2 text-primary"></i> Recent Payments</h5>
+                        <a href="{% url 'payment_list' %}" class="btn btn-sm btn-outline-primary fw-semibold">All Payments</a>
+                    </div>
+                    <div class="table-responsive px-4 pb-4">
+                        <table class="table align-middle small table-hover">
+                            <thead class="table-light text-uppercase extra-small">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments %}
+                                    <tr>
+                                        <td>{{ payment.property.property_name }}</td>
+                                        <td class="fw-bold">₹{{ payment.amount }}</td>
+                                        <td>{{ payment.payment_method }}</td>
+                                        <td>
+                                            <span class="badge {% if payment.status == 'Completed' %}bg-success-subtle text-success{% elif payment.status == 'Pending' %}bg-warning-subtle text-warning{% else %}bg-danger-subtle text-danger{% endif %} px-2 py-0.5">
+                                                {{ payment.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="bi bi-wallet2 fs-2"></i>
+                                            <p class="small mt-2">No payments recorded.</p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

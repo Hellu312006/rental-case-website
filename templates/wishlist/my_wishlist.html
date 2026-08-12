@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlist - RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="bi bi-heart-fill text-danger me-2"></i> My Wishlist</h2>
+            <p class="text-muted mb-0">List of properties you have saved for future bookings.</p>
+        </div>
+        <a href="{% url 'properties_list' %}" class="btn btn-outline-primary fw-semibold"><i class="bi bi-search me-1"></i> Browse Listings</a>
+    </div>
+
+    <!-- Wishlist Grid -->
+    <div class="row g-4">
+        {% for item in wishlist_items %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card-premium h-100 d-flex flex-column">
+                    <div class="card-img-wrapper">
+                        <img src="{{ item.property.image.url }}" alt="{{ item.property.property_name }}">
+                        <span class="card-badge bg-primary">{{ item.property.property_type }}</span>
+                        
+                        <!-- Remove button -->
+                        <div class="wishlist-btn-absolute">
+                            <a href="{% url 'toggle_wishlist' item.property.id %}" class="btn-wishlist shadow-sm" title="Remove from Wishlist">
+                                <i class="bi bi-heart-fill"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ item.property.city.name }}, {{ item.property.state.name }}</span>
+                            <div class="d-flex align-items-center gap-1 text-warning small">
+                                <i class="bi bi-star-fill"></i>
+                                <span class="fw-semibold text-dark">
+                                    {% if item.property.reviews.all %}
+                                        <!-- Fallback/Show dynamic count -->
+                                        ★ {{ item.property.reviews.all.count }}
+                                    {% else %}
+                                        New
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2"><a href="{% url 'property_detail' item.property.id %}" class="text-decoration-none text-dark">{{ item.property.property_name }}</a></h5>
+                        <p class="small text-muted mb-3">{{ item.property.description|truncatewords:10 }}</p>
+                        
+                        <!-- Price Details and View Button -->
+                        <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top">
+                            <div>
+                                <span class="fs-5 fw-bold text-primary">₹{{ item.property.rent_per_month }}</span>
+                                <span class="small text-muted">/mo</span>
+                            </div>
+                            <a href="{% url 'property_detail' item.property.id %}" class="btn btn-sm btn-primary px-3 py-1.5 fw-semibold">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-heartbreak-fill fs-1 text-muted"></i>
+                <h4 class="mt-3 fw-bold text-dark">No Wishlisted Properties</h4>
+                <p class="text-muted">Explore our property listing directory and save listings to your wishlist.</p>
+                <a href="{% url 'properties_list' %}" class="btn btn-primary mt-2">Browse Properties</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action_name }} - RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-header bg-primary text-white p-4">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-house-add-fill me-2"></i> {{ action_name }}</h5>
+                </div>
+                <div class="card-body p-5">
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger border-0 small">
+                            <strong>Form errors found:</strong> Please review and correct the marked inputs.
+                        </div>
+                    {% endif %}
+                    
+                    <form method="POST" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Core Details -->
+                        <h5 class="fw-bold text-primary mb-3">Core Property Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Property Title</label>
+                                {{ form.property_name }}
+                                {% if form.property_name.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.property_name.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-muted">Category</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.category.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-muted">Property Type</label>
+                                {{ form.property_type }}
+                                {% if form.property_type.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.property_type.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted">Detailed Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.description.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Rent & Inventory -->
+                        <h5 class="fw-bold text-primary mb-3">Pricing & Availability</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-3">
+                                <label class="form-label small fw-semibold text-muted">Rent / Month (₹)</label>
+                                {{ form.rent_per_month }}
+                                {% if form.rent_per_month.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.rent_per_month.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label small fw-semibold text-muted">Security Deposit (₹)</label>
+                                {{ form.security_deposit }}
+                                {% if form.security_deposit.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.security_deposit.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label small fw-semibold text-muted">Total Rooms</label>
+                                {{ form.total_rooms }}
+                                {% if form.total_rooms.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.total_rooms.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label small fw-semibold text-muted">Available Rooms</label>
+                                {{ form.available_rooms }}
+                                {% if form.available_rooms.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.available_rooms.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Geography / Location -->
+                        <h5 class="fw-bold text-primary mb-3">Address & Geography</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted">Street Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.address.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-semibold text-muted">Country</label>
+                                {{ form.country }}
+                                {% if form.country.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.country.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-semibold text-muted">State</label>
+                                {{ form.state }}
+                                {% if form.state.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.state.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-semibold text-muted">City</label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.city.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Images Upload -->
+                        <h5 class="fw-bold text-primary mb-3">Property Media & Gallery</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-muted">Main Cover Image (Required)</label>
+                                {{ form.image }}
+                                {% if form.image.errors %}
+                                    <div class="text-danger small mt-1">{% for err in form.image.errors %}{{ err }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Inline Formset for Gallery Images -->
+                            <div class="col-12 mt-4">
+                                <label class="form-label small fw-semibold text-dark mb-2">Upload Gallery Images (Up to 5 images)</label>
+                                {{ formset.management_form }}
+                                <div class="row g-3">
+                                    {% for f in formset %}
+                                        <div class="col-md-6 border-bottom pb-3">
+                                            <div class="small fw-semibold text-muted mb-1">Gallery Image #{{ forloop.counter }}</div>
+                                            {{ f.id }}
+                                            {{ f.image }}
+                                            {% if f.image.errors %}
+                                                <div class="text-danger extra-small mt-1">{% for err in f.image.errors %}{{ err }}{% endfor %}</div>
+                                            {% endif %}
+                                            {% if formset.can_delete %}
+                                                <div class="form-check mt-1">
+                                                    {{ f.DELETE }}
+                                                    <label class="form-check-label extra-small text-danger">Remove this image</label>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end border-top pt-4">
+                            <a href="{% url 'dashboard_redirect' %}" class="btn btn-outline-secondary fw-semibold">Cancel</a>
+                            <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm">Save Listing</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const countryField = document.getElementById('id_country');
+    const stateField = document.getElementById('id_state');
+    const cityField = document.getElementById('id_city');
+
+    countryField.addEventListener('change', function () {
+        const countryId = this.value;
+        if (!countryId) {
+            stateField.innerHTML = '<option value="">---------</option>';
+            cityField.innerHTML = '<option value="">---------</option>';
+            return;
+        }
+
+        fetch(`/properties/ajax/load-states/?country_id=${countryId}`)
+            .then(response => response.json())
+            .then(data => {
+                let html = '<option value="">---------</option>';
+                data.forEach(item => {
+                    html += `<option value="${item.id}">${item.name}</option>`;
+                });
+                stateField.innerHTML = html;
+                cityField.innerHTML = '<option value="">---------</option>';
+            });
+    });
+
+    stateField.addEventListener('change', function () {
+        const stateId = this.value;
+        if (!stateId) {
+            cityField.innerHTML = '<option value="">---------</option>';
+            return;
+        }
+
+        fetch(`/properties/ajax/load-cities/?state_id=${stateId}`)
+            .then(response => response.json())
+            .then(data => {
+                let html = '<option value="">---------</option>';
+                data.forEach(item => {
+                    html += `<option value="${item.id}">${item.name}</option>`;
+                });
+                cityField.innerHTML = html;
+            });
+    });
+});
+</script>
+{% endblock %}

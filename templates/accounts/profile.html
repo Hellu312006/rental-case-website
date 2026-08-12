@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-header bg-primary text-white p-4 d-flex align-items-center justify-content-between">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-person-bounding-box me-2"></i> Account Details</h5>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-sm btn-light fw-bold"><i class="bi bi-pencil-square me-1"></i> Edit Profile</a>
+                </div>
+                <div class="card-body p-5">
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center border-end">
+                            <div class="mb-3">
+                                {% if request.user.profile_image %}
+                                    <img src="{{ request.user.profile_image.url }}" alt="Profile" class="rounded-circle shadow img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% elif profile.image %}
+                                    <img src="{{ profile.image.url }}" alt="Profile" class="rounded-circle shadow img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-secondary text-white rounded-circle shadow mx-auto d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; font-size: 3rem; font-weight: 700;">
+                                        {{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <h4 class="fw-bold text-dark mb-1">{{ request.user.first_name }} {{ request.user.last_name }}</h4>
+                            <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ request.user.role }}</span>
+                            <div class="text-muted small mt-3">Joined: {{ request.user.date_joined|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="col-md-8 ps-md-4">
+                            <h5 class="fw-bold text-primary mb-3">General Information</h5>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">First Name</div>
+                                    <div class="fw-semibold">{{ request.user.first_name }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Last Name</div>
+                                    <div class="fw-semibold">{{ request.user.last_name }}</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="small text-muted">Email Address</div>
+                                    <div class="fw-semibold text-break">{{ request.user.email }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Phone Number</div>
+                                    <div class="fw-semibold">{% if profile.phone_no %}{{ profile.phone_no }}{% else %}<span class="text-muted font-monospace small">Not added</span>{% endif %}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="small text-muted">Date of Birth</div>
+                                    <div class="fw-semibold">{% if profile.dob %}{{ profile.dob|date:"M d, Y" }}{% else %}<span class="text-muted font-monospace small">Not added</span>{% endif %}</div>
+                                </div>
+                                
+                                <div class="col-12"><hr class="my-2"></div>
+                                
+                                <h5 class="fw-bold text-primary mb-1 mt-3">Address & Geography</h5>
+                                <div class="col-12">
+                                    <div class="small text-muted">Street Address</div>
+                                    <div class="fw-semibold">{% if profile.address %}{{ profile.address }}{% else %}<span class="text-muted font-monospace small">Not added</span>{% endif %}</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="small text-muted">City</div>
+                                    <div class="fw-semibold">{% if profile.city %}{{ profile.city.name }}{% else %}<span class="text-muted font-monospace small">Not added</span>{% endif %}</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="small text-muted">State</div>
+                                    <div class="fw-semibold">{% if profile.state %}{{ profile.state.name }}{% else %}<span class="text-muted font-monospace small">Not added</span>{% endif %}</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="small text-muted">Country</div>
+                                    <div class="fw-semibold">{% if profile.country %}{{ profile.country.name }}{% else %}<span class="text-muted font-monospace small">Not added</span>{% endif %}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

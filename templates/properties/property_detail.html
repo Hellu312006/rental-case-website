@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ property.property_name }} - Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <!-- Breadcrumbs / Back button -->
+    <div class="mb-4">
+        <a href="{% url 'properties_list' %}" class="btn btn-sm btn-outline-secondary fw-semibold"><i class="bi bi-arrow-left me-1"></i> Back to Catalog</a>
+    </div>
+
+    <div class="row g-5">
+        
+        <!-- Left: Image Gallery & Reviews -->
+        <div class="col-lg-8">
+            
+            <!-- Main Large Image -->
+            <div class="position-relative mb-3">
+                <img id="mainGalleryImg" src="{{ property.image.url }}" alt="{{ property.property_name }}" class="gallery-main-img shadow-sm">
+                <span class="card-badge bg-primary fs-6 px-3 py-2">{{ property.property_type }}</span>
+            </div>
+
+            <!-- Gallery Thumbnails (only if there are multiple images) -->
+            <div class="row g-2 mb-5">
+                <div class="col-3">
+                    <img src="{{ property.image.url }}" alt="Thumbnail Main" class="gallery-thumbnail active" onclick="changeMainImage('{{ property.image.url }}', this)">
+                </div>
+                {% for gallery in gallery_images %}
+                    <div class="col-3">
+                        <img src="{{ gallery.image.url }}" alt="Thumbnail {{ forloop.counter }}" class="gallery-thumbnail" onclick="changeMainImage('{{ gallery.image.url }}', this)">
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Description Card -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                <h4 class="fw-bold text-dark mb-3">Property Description</h4>
+                <p class="text-muted" style="line-height: 1.6;">{{ property.description|linebreaksbr }}</p>
+                
+                <h5 class="fw-bold text-dark mt-4 mb-3">Location Details</h5>
+                <p class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ property.address }}</p>
+                <div class="row g-3 text-center bg-light p-3 rounded-3 small">
+                    <div class="col-4 border-end">
+                        <span class="text-muted">City</span>
+                        <div class="fw-bold text-dark">{{ property.city.name }}</div>
+                    </div>
+                    <div class="col-4 border-end">
+                        <span class="text-muted">State</span>
+                        <div class="fw-bold text-dark">{{ property.state.name }}</div>
+                    </div>
+                    <div class="col-4">
+                        <span class="text-muted">Country</span>
+                        <div class="fw-bold text-dark">{{ property.country.name }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews List Section -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-dark mb-0">Ratings & Reviews</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="text-warning fs-5">
+                            {% for i in avg_stars_full %}<i class="bi bi-star-fill"></i>{% endfor %}
+                            {% if avg_stars_half %}<i class="bi bi-star-half"></i>{% endif %}
+                            {% for i in avg_stars_empty %}<i class="bi bi-star"></i>{% endfor %}
+                        </div>
+                        <span class="fw-bold text-dark fs-5">
+                            {% if property.avg_rating %}{{ property.avg_rating|floatformat:1 }}{% else %}New{% endif %}
+                        </span>
+                        <span class="text-muted small">({{ reviews.count }} Reviews)</span>
+                    </div>
+                </div>
+
+                <!-- Review list -->
+                <div class="d-flex flex-column gap-3 mb-4">
+                    {% for review in reviews %}
+                        <div class="border-bottom pb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="fw-bold small text-dark">{{ review.user.first_name }} {{ review.user.last_name }}</div>
+                                    <span class="text-muted extra-small">{{ review.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="text-warning small">
+                                    <!-- Render star icons for each review rating -->
+                                    {% for r in "x"|ljust:review.rating %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0">{{ review.comment }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-chat-left-dots fs-3"></i>
+                            <p class="small mt-2">No reviews posted for this property yet. Be the first to share your experience!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Submit Review Form (if Tenant is logged in and hasn't reviewed yet) -->
+                {% if request.user.is_authenticated and request.user.role == 'Tenant' %}
+                    {% if not has_reviewed %}
+                        <div class="bg-light p-4 rounded-3 mt-4">
+                            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i> Write a Review</h5>
+                            <form action="{% url 'add_review' property.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    <div class="col-sm-4">
+                                        <label class="form-label small fw-semibold text-muted">Rating</label>
+                                        <select name="rating" class="form-select">
+                                            <option value="5">5 Stars</option>
+                                            <option value="4">4 Stars</option>
+                                            <option value="3">3 Stars</option>
+                                            <option value="2">2 Stars</option>
+                                            <option value="1">1 Star</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-semibold text-muted">Comment</label>
+                                        <textarea name="comment" class="form-control" rows="3" required placeholder="Describe your experience at this property..."></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary fw-bold px-4 py-2">Submit Review</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary border-0 small mb-0 rounded-3"><i class="bi bi-info-circle me-1"></i> You have already reviewed this property.</div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Right: Rent Details & Booking Widget -->
+        <div class="col-lg-4">
+            
+            <!-- Price and Details Card -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                <div class="mb-3">
+                    <span class="fs-2 fw-bold text-primary">₹{{ property.rent_per_month }}</span>
+                    <span class="text-muted">/ month</span>
+                </div>
+                <div class="row g-2 mb-4 border-top border-bottom py-3 small text-center text-muted">
+                    <div class="col-6 border-end">
+                        <span class="extra-small text-muted d-block">Security Deposit</span>
+                        <span class="fw-bold text-dark fs-6">₹{{ property.security_deposit }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="extra-small text-muted d-block">Available Rooms</span>
+                        <span class="fw-bold text-dark fs-6">{{ property.available_rooms }} / {{ property.total_rooms }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <!-- Wishlist Toggle (Tenant Only) -->
+                    {% if request.user.is_authenticated and request.user.role == 'Tenant' %}
+                        <a href="{% url 'toggle_wishlist' property.id %}" class="btn {% if is_wishlisted %}btn-danger{% else %}btn-outline-danger{% endif %} py-2 fw-bold w-100">
+                            {% if is_wishlisted %}
+                                <i class="bi bi-heart-fill me-2"></i> Remove Wishlist
+                            {% else %}
+                                <i class="bi bi-heart me-2"></i> Add to Wishlist
+                            {% endif %}
+                        </a>
+                    {% endif %}
+
+                    <!-- Owner Quick info -->
+                    <div class="card bg-light border-0 p-3 rounded-3 mt-3">
+                        <div class="fw-bold text-dark small mb-2"><i class="bi bi-person-fill text-primary me-1"></i> Owner Information</div>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if property.owner.profile_image %}
+                                <img src="{{ property.owner.profile_image.url }}" alt="{{ property.owner.first_name }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% endif %}
+                            <div>
+                                <div class="fw-bold small">{{ property.owner.first_name }} {{ property.owner.last_name }}</div>
+                                <span class="text-muted extra-small">{{ property.owner.email }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Owner Trigger (simple info display toggle or modal) -->
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-3 fw-bold" data-bs-toggle="collapse" data-bs-target="#contactDetails">
+                            <i class="bi bi-telephone-fill me-1"></i> Contact Owner
+                        </button>
+                        <div class="collapse mt-2 text-center" id="contactDetails">
+                            <div class="small fw-semibold border rounded-3 p-2 bg-white mt-1">
+                                <div class="text-dark"><i class="bi bi-envelope"></i> {{ property.owner.email }}</div>
+                                {% if property.owner.userprofile_set.first.phone_no %}
+                                    <div class="text-dark mt-1"><i class="bi bi-phone"></i> {{ property.owner.userprofile_set.first.phone_no }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Widget Form (Tenant Only, and not their own property) -->
+            {% if request.user.is_authenticated and request.user.role == 'Tenant' %}
+                {% if property.owner != request.user %}
+                    <div class="card border-0 shadow-sm rounded-3 p-4">
+                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-check me-2 text-primary"></i> Book Property</h5>
+                        
+                        {% if property.available_rooms > 0 %}
+                            {% if not has_active_booking %}
+                                <form action="{% url 'create_booking' property.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold text-muted">Desired Move-in Date</label>
+                                        <input type="date" name="move_in_date" class="form-control" required min="{{ today_str }}">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold text-muted">Stay Duration (Months)</label>
+                                        <input type="number" name="duration_months" class="form-control" required min="1" max="36" placeholder="e.g. 6">
+                                    </div>
+                                    <button type="submit" class="btn btn-success py-2.5 fw-bold w-100 shadow-sm"><i class="bi bi-send me-1"></i> Submit Booking Request</button>
+                                </form>
+                            {% else %}
+                                <div class="alert alert-info border-0 small mb-0 rounded-3">
+                                    <i class="bi bi-info-circle me-1"></i> You have an active (pending/approved) booking request.
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-warning border-0 small mb-0 rounded-3">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Fully Booked! No rooms available right now.
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% elif not request.user.is_authenticated %}
+                <div class="card border-0 shadow-sm rounded-3 p-4 text-center">
+                    <p class="small text-muted mb-3">Sign in as a tenant to book or wishlist this property.</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm fw-bold">Sign In to Book</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeMainImage(imgUrl, element) {
+    document.getElementById('mainGalleryImg').src = imgUrl;
+    document.querySelectorAll('.gallery-thumbnail').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+}
+</script>
+{% endblock %}

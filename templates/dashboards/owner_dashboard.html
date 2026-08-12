@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Owner Dashboard - RentEase{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- Sidebar Navigation -->
+    <div class="dashboard-sidebar d-flex flex-column justify-content-between">
+        <div>
+            <div class="px-3 py-2 text-white-50 small text-uppercase fw-semibold mb-3">Owner Panel</div>
+            <nav class="nav flex-column">
+                <a class="sidebar-link active" href="{% url 'dashboard_redirect' %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a class="sidebar-link" href="#my-properties">
+                    <i class="bi bi-houses"></i> My Properties
+                </a>
+                <a class="sidebar-link" href="{% url 'add_property' %}">
+                    <i class="bi bi-plus-circle"></i> Add Property
+                </a>
+                <a class="sidebar-link" href="#booking-requests">
+                    <i class="bi bi-envelope-paper"></i> Booking Requests
+                </a>
+                <a class="sidebar-link" href="{% url 'payment_list' %}">
+                    <i class="bi bi-credit-card"></i> Payments
+                </a>
+                <a class="sidebar-link" href="{% url 'profile' %}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </nav>
+        </div>
+        <div class="border-top border-secondary pt-3">
+            <a class="sidebar-link text-danger" href="{% url 'logout' %}">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Panel -->
+    <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">Welcome, {{ request.user.first_name }}!</h2>
+                <p class="text-muted mb-0">Here is the overview of your rental properties and management ledger.</p>
+            </div>
+            <a href="{% url 'add_property' %}" class="btn btn-primary fw-bold shadow-sm"><i class="bi bi-plus-lg me-1"></i> Add Property</a>
+        </div>
+
+        <!-- 1. Stats Counter Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #0F172A;">
+                    <div class="text-muted small fw-semibold text-uppercase">Total Properties</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ total_properties }}</div>
+                    <span class="small text-muted">Listed properties</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #059669;">
+                    <div class="text-muted small fw-semibold text-uppercase">Available Listings</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ available_properties }}</div>
+                    <span class="small text-muted">Rooms available</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #D97706;">
+                    <div class="text-muted small fw-semibold text-uppercase">Pending Requests</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ pending_requests }}</div>
+                    <span class="small text-muted">Awaiting your approval</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="dashboard-metric-card" style="border-left-color: #2563EB;">
+                    <div class="text-muted small fw-semibold text-uppercase">Approved Bookings</div>
+                    <div class="display-6 fw-bold text-dark my-1">{{ approved_bookings }}</div>
+                    <span class="small text-muted">Active bookings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. My Properties Section -->
+        <div id="my-properties" class="card border-0 shadow-sm rounded-3 mb-5">
+            <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-houses me-2 text-primary"></i> My Properties</h5>
+                <span class="badge bg-light text-dark border">{{ total_properties }} Listed</span>
+            </div>
+            <div class="table-responsive px-4 pb-4">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light small text-uppercase">
+                        <tr>
+                            <th>Property Info</th>
+                            <th>Type / Category</th>
+                            <th>Rent / Deposit</th>
+                            <th>Availability</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prop in my_properties %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ prop.image.url }}" alt="{{ prop.property_name }}" class="rounded-3 me-3" style="width: 60px; height: 45px; object-fit: cover;">
+                                        <div>
+                                            <div class="fw-bold"><a href="{% url 'property_detail' prop.id %}" class="text-decoration-none text-dark">{{ prop.property_name }}</a></div>
+                                            <span class="text-muted small"><i class="bi bi-geo-alt me-1 text-danger"></i>{{ prop.city.name }}, {{ prop.state.name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ prop.property_type }}</div>
+                                    <span class="text-muted small">{{ prop.category.category_name }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-primary">₹{{ prop.rent_per_month }}/mo</div>
+                                    <span class="text-muted small">Deposit: ₹{{ prop.security_deposit }}</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">{{ prop.available_rooms }}</span> <span class="text-muted">/ {{ prop.total_rooms }} Rooms</span>
+                                    <div class="progress mt-1" style="height: 4px; max-width: 120px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio prop.available_rooms prop.total_rooms 100 %}%"></div>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'property_detail' prop.id %}" class="btn btn-sm btn-light border" title="Preview"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'edit_property' prop.id %}" class="btn btn-sm btn-outline-primary border" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'delete_property' prop.id %}" class="btn btn-sm btn-outline-danger border" title="Delete"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-house-add fs-1"></i>
+                                    <p class="mt-2">You haven't listed any properties yet.</p>
+                                    <a href="{% url 'add_property' %}" class="btn btn-sm btn-primary">List Property</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. Booking Requests Section -->
+        <div id="booking-requests" class="card border-0 shadow-sm rounded-3 mb-5">
+            <div class="card-header bg-white p-4 border-0">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-envelope-paper me-2 text-primary"></i> Recent Booking Requests</h5>
+            </div>
+            <div class="table-responsive px-4 pb-4">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light small text-uppercase">
+                        <tr>
+                            <th>Tenant</th>
+                            <th>Property</th>
+                            <th>Move-in Date</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th class="text-end">Decisions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in recent_bookings %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ req.tenant.first_name }} {{ req.tenant.last_name }}</div>
+                                    <span class="text-muted small">{{ req.tenant.email }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'property_detail' req.property.id %}" class="text-decoration-none text-dark fw-semibold">{{ req.property.property_name }}</a>
+                                </td>
+                                <td>{{ req.move_in_date|date:"M d, Y" }}</td>
+                                <td>{{ req.duration_months }} Months</td>
+                                <td>
+                                    <span class="badge-status {% if req.status == 'Pending' %}badge-pending{% elif req.status == 'Approved' %}badge-approved{% else %}badge-rejected{% endif %}">
+                                        {{ req.status }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    {% if req.status == 'Pending' %}
+                                        <a href="{% url 'booking_action' req.id 'approve' %}" class="btn btn-sm btn-success px-3 me-1 fw-bold"><i class="bi bi-check-lg"></i> Approve</a>
+                                        <a href="{% url 'booking_action' req.id 'reject' %}" class="btn btn-sm btn-danger px-3 fw-bold"><i class="bi bi-x-lg"></i> Reject</a>
+                                    {% else %}
+                                        <span class="text-muted small">Processed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-envelope-x fs-1"></i>
+                                    <p class="mt-2">No recent booking requests found.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. Recent Payments Section -->
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-receipt-cutoff me-2 text-primary"></i> Rent Payments Ledger</h5>
+                <a href="{% url 'payment_list' %}" class="btn btn-sm btn-outline-primary fw-semibold">View All Payments</a>
+            </div>
+            <div class="table-responsive px-4 pb-4">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light small text-uppercase">
+                        <tr>
+                            <th>Tenant</th>
+                            <th>Property</th>
+                            <th>Amount</th>
+                            <th>Payment Month</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in recent_payments %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ payment.user.first_name }} {{ payment.user.last_name }}</div>
+                                    <span class="text-muted small">{{ payment.user.email }}</span>
+                                </td>
+                                <td>{{ payment.property.property_name }}</td>
+                                <td class="fw-bold text-dark">₹{{ payment.amount }}</td>
+                                <td>{{ payment.payment_month }}</td>
+                                <td>{{ payment.payment_method }}</td>
+                                <td>
+                                    <span class="badge {% if payment.status == 'Completed' %}bg-success-subtle text-success{% elif payment.status == 'Pending' %}bg-warning-subtle text-warning{% else %}bg-danger-subtle text-danger{% endif %} border px-2.5 py-1">
+                                        {{ payment.status }}
+                                    </span>
+                                </td>
+                                <td class="small text-muted">{{ payment.payment_date|date:"M d, Y h:i A" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-credit-card-2-back fs-1"></i>
+                                    <p class="mt-2">No payments logged yet.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
